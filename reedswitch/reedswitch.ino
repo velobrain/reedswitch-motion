@@ -1,14 +1,15 @@
 const int REED_PIN = 2; // Pin connected to reed switch
 const int LED_PIN = 13; // LED pin - active-high
-const int RADIUS = 30; // cm
+const float RADIUS = 0.3; // metres
 const float PIE = 3.14159;
 const int numberOfMagnets = 1;
-const uint32_t period = 10000; // 10 seconds
+const int intervalLength = 10; // 10 seconds
+const uint32_t period = intervalLength*1000; // 10 seconds
 boolean closed = false;
 int revs = 0;
 float circumference = 2*PIE*RADIUS;
 float arcLength = circumference/numberOfMagnets;
-float distance = 0;
+int numIntervals = 0;
 
 void setup() 
 {
@@ -21,6 +22,7 @@ void setup()
 
 void loop() 
 {
+  float distance = 0;
   for( uint32_t tStart = millis();  (millis()-tStart) < period;  ) {
     int proximity = digitalRead(REED_PIN); // Read the state of the switch
     if (proximity == LOW) // If the pin reads low, the switch is closed.
@@ -39,9 +41,20 @@ void loop()
       }
       closed = false;
       digitalWrite(LED_PIN, LOW); // Turn the LED off
-      Serial.print("distance: ");
-      Serial.println(distance);
+//      Serial.print("distance: ");
+//      Serial.println(distance);
     }
   }
+  numIntervals++;
   Serial.println("10 seconds elapsed.....................");
+  Serial.print("Distance this interval: ");
+  Serial.print(distance);
+  Serial.println(" m");
+  Serial.print("Speed this interval: ");
+  Serial.print(distance/intervalLength);
+  Serial.println(" m/s");
+  Serial.print("Total distance: ");
+  Serial.println(revs*arcLength);
+  Serial.print("Average speed: ");
+  Serial.println((revs*arcLength)/(numIntervals*intervalLength));
 }
